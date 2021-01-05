@@ -1,67 +1,89 @@
 # p88
 É como um piano de 88 teclas,
 onde cada nota orquestrada soam
-em harmonia :joy: :musical_keyboard:
+em harmonia. :joy: :musical_keyboard:
 
-O objetivo desse projeto é trazer mais harmonia e
-tranquilidade para os devs usando *infra as code*,
-que tem vários projetos e não conseguem mais ficar
-criando e configurando servidores na mão :notes:
+O objetivo desse projeto é trazer qualidade de vida
+para os *devs* que tem vários projetos e não aguentam mais
+ficar configurando os apps na mão. :notes:
 
-Nesse projeto vamos usar o provedor
+Utilizando o conceito de *infra as code*
+cada *app* vai ter seus recursos como código,
+tendo controle do que tem em cada VM e possibilitando
+recriar os ambientes com pouco esforço usando
+[terraform](https://www.terraform.io)
+e [ansible](https://www.ansible.com).
+
+O provedor que será utilizado é o
 [Digital Ocean](https://www.digitalocean.com),
-com máquinas a partir de $5/mês :moneybag:
+com máquinas a partir de $5/mês. :moneybag:
 
 ## Requisitos
 Para rodar esse projeto, vamos usar o 
 [docker](https://docker.com)
-com a imagem base `debian stable-slim` :whale2:
+com a imagem base `debian stable-slim`. :whale2:
 
-# Projetos
-O p88 é dividido em projetos,
-podendo provisionar cada um individualmente.
+Vamos precisar de uma conta no 
+[Digital Ocean](https://www.digitalocean.com)
+e criar um *token* e um *fingerprint* para
+interagir via API com o [terraform](https://www.terraform.io).
+
+## Apps
+Os apps são as divisões de aplicativos/projetos
+que deseja organizar, como um contexto.
+Podendo separar por ambientes como:
+`development`, `staging` e `production`.
 
 No exemplo, vamos ter o `project-1`,
-com dois ambientes `prod` e `stage`
-e `project-2` com apenas `prod`.
+com dois ambientes `prod` e `staging`
+e `project-2` com apenas `development`.
 
-```
+Veja como fica a divisão de pastas dentro do p88:
+```bash
+apps
 ├── project-1
-│   ├── prod
-│   │   ├── ansible
-│   │   │   ├── ansible.cfg
-│   │   │   ├── config.yml
-│   │   │   └── playbook.yml
-│   │   └── terraform
-│   │       ├── locals.tf
-│   │       ├── main.tf
-│   │       └── variables.tf
-│   └── staging
-│       ├── ansible
-│       │   ├── ansible.cfg
-│       │   ├── config.yml
-│       │   └── playbook.yml
-│       └── terraform
-│           ├── locals.tf
-│           ├── main.tf
-│           └── variables.tf
+│   ├── prod
+│   │   ├── ansible
+│   │   │   ├── ansible.cfg
+│   │   │   ├── config.yml
+│   │   │   └── playbook.yml
+│   │   └── terraform
+│   │       ├── locals.tf
+│   │       ├── main.tf
+│   │       └── variables.tf
+│   └── staging
+│       ├── ansible
+│       │   ├── ansible.cfg
+│       │   ├── config.yml
+│       │   └── playbook.yml
+│       └── terraform
+│           ├── locals.tf
+│           ├── main.tf
+│           └── variables.tf
 └── project-2
-    └── deployment
+    └── development
         ├── ansible
-        │   ├── ansible.cfg
-        │   ├── config.yml
-        │   └── playbook.yml
+        │   ├── ansible.cfg
+        │   ├── config.yml
+        │   └── playbook.yml
         └── terraform
             ├── locals.tf
             ├── main.tf
             └── variables.tf
 ```
 
-## Terraform
-Para criar a infraestrutura vamos utilizar o terraform.
+Como exemplo ilustrativo o `project-1` será um deploy
+de uma imagem do `nginx:stable-alpine`,
+com a configuração de domínio.
+
+No segundo `project-2`, será um ambiente de desenvolvimento
+com a imagem do `sapk/cloud9:golang-alpine`.
+
+### Terraform
+Para criar a infraestrutura vamos utilizar o [terraform](https://www.terraform.io).
 
 No arquivo `locals.tf` são as variáveis que
-serão utilizadas para criação da infra. Exemplo:
+serão utilizadas para criação da infra:
 ```
 locals {
 	env = "production"
@@ -118,10 +140,12 @@ module "project" {
 ```
 
 Nesse exemplo, criamos uma *droplet*, um *domain*
-e relacionamos os dois a um *projeto* no Digital Ocean.
+e relacionamos os dois a um *projeto* no
+[Digital Ocean](https://www.digitalocean.com).
 
-## Ansible
-Vamos usar o ansible para configurar as *droplets*.
+### Ansible
+Vamos usar o [ansible](https://www.ansible.com)
+para configurar as *droplets*.
 
 Exemplo do `config.yml`:
 ```yml
@@ -145,27 +169,33 @@ tasks:
       state: started
       ports:
         - 80:80
-
 ```
 
-## Rodando o Projeto
-Antes de executar os comandos `make`, você precisar
-criar um *token* e um *fingerprint* na
-[Digital Ocean](https://www.digitalocean.com).
-Feito isso, vai precisar expotar essas variáveis para o ambiente.
+Nesse exemplo do `project-1` foram instaladas duas *roles*
+do ansible [docker](https://github.com/geerlingguy/ansible-role-docker)
+e [pip](https://github.com/geerlingguy/ansible-role-pip) para configurar a *droplet*.
+Posteriormente baixando e criando o container
+com a imagem `nginx:stable-alpine` disponível no
+[Docker Hub](https://hub.docker.com/_/nginx).
 
+## Rodando o Projeto
+Para rodar o projeto vamos precisar expotar o `token` e o
+`fingerprint`criado no [Digital Ocean](https://www.digitalocean.com)
+como variáveis de ambiente:
 ```bash
 export do_token=<coloque-seu-token-aqui>
-
 export do_fingerprint=<coloque-seu-fingerprint-aqui>
 ```
 
-Depois crie a imagem docker com o terraform e ansible, execute:
+Depois vamos construir a imagem docker do p88 com o terraform e
+[ansible](https://www.ansible.com)
+para rodar os provisionamentos:
 ```bash
 make build
 ```
 
-Feito isso já é possível provisionar o ambiente usando terraform e ansible.
+> Feito isso já é possível provisionar o ambiente usando terraform e
+[ansible](https://www.ansible.com).
 
 ### Criando a infraestrutura com Terraform
 Os comandos a baixo utilizam o terraform
@@ -176,8 +206,8 @@ Para criar os recursos, execute:
 make terraform-apply app=project-1 env=prod
 ```
 
-Abrindo o Digital Ocean, podemos visualizar
-os recursos criados.
+Abrindo o [Digital Ocean](https://www.digitalocean.com),
+podemos visualizar os recursos criados:
 ![alt text](docs/do-project-1.png)
 
 Se precisar destruir os recursos, execute:
@@ -186,14 +216,15 @@ make terraform-destroy app=project-1 env=prod
 ```
 
 ### Provisionando com o Ansible
-Com a *droplet* criada vamos provisionar usando ansible.
+Com a *droplet* criada vamos provisionar usando
+[ansible](https://www.ansible.com).
 
 Para provisionar todo o ambiente do projeto, execute:
 ```
 make ansible app=project-1 env=prod
 ```
 
-Acessando o endereço ip da *droplet* já é possível acessar a aplicação.
+Acessando o endereço ip da *droplet* já é possível acessar a aplicação:
 ![alt text](docs/project-1.png)
 
 Se precisar especificar uma task, utilize a variável `tags`,
@@ -203,22 +234,14 @@ make ansible app=project-1 env=prod tags=app
 ```
 
 ## Testando
-Para verificar o funcionamento da droplet, entre via ssh e liste
-os container em execução:
-
+Para verificar o funcionamento da * droplet* , entre via `ssh <container-ip> -l root`
+e liste os container em execução usando `docker ps`:
 ```bash
 > ssh 45.55.35.147 -l root
-
-Welcome to Ubuntu 18.04.5 LTS (GNU/Linux 4.15.0-121-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
 root@project-1-production:~# docker ps
 CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                NAMES
 863f134396b5   nginx:stable-alpine   "/docker-entrypoint.…"   47 seconds ago   Up 45 seconds   0.0.0.0:80->80/tcp   project-1
 ```
 
-Acessando o `project-2`
+Acessando o ambiente de dessenvolimento do `project-2`:
 ![alt text](docs/project-2.png)
