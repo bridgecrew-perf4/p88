@@ -1,8 +1,7 @@
 # p88
-O projeto p88 um piano de 88 teclas,
-onde cada nota soa individualmente
-mas quando orquestradas acabam criando
-uma harmonia :musical_keyboard:
+É como um piano de 88 teclas,
+onde cada nota orquestrada soam
+em harmonia :joy: :musical_keyboard:
 
 O objetivo desse projeto é trazer mais harmonia e
 tranquilidade para os devs usando *infra as code*,
