@@ -11,7 +11,7 @@ criando e configurando servidores na mão :notes:
 
 Nesse projeto vamos usar o provedor
 [Digital Ocean](https://www.digitalocean.com),
-com máquinas a partir de $5 dolares/mês :moneybag:
+com máquinas a partir de $5/mês :moneybag:
 
 ## Requisitos
 Para rodar esse projeto, vamos usar o 
@@ -47,7 +47,7 @@ e `project-2` com apenas `prod`.
 │           ├── main.tf
 │           └── variables.tf
 └── project-2
-    └── prod
+    └── deployment
         ├── ansible
         │   ├── ansible.cfg
         │   ├── config.yml
@@ -59,7 +59,7 @@ e `project-2` com apenas `prod`.
 ```
 
 ## Terraform
-Para criar os recursos e droplets vamos utilizar o terraform.
+Para criar a infraestrutura vamos utilizar o terraform.
 
 No arquivo `locals.tf` são as variáveis que
 serão utilizadas para criação da infra. Exemplo:
@@ -119,10 +119,10 @@ module "project" {
 ```
 
 Nesse exemplo, criamos uma *droplet*, um *domain*
-e relacionamos a um *projeto* no Digital Ocean.
+e relacionamos os dois a um *projeto* no Digital Ocean.
 
 ## Ansible
-Vamos usar o ansible para configurar as droplets.
+Vamos usar o ansible para configurar as *droplets*.
 
 Exemplo do `config.yml`:
 ```yml
@@ -149,10 +149,11 @@ tasks:
 
 ```
 
-## Comandos
+## Rodando o Projeto
 Antes de executar os comandos `make`, você precisar
-criar um *token* e um *fingerprint* na Digital Ocean.
-Feito isso, vai precisar expotar.
+criar um *token* e um *fingerprint* na
+[Digital Ocean](https://www.digitalocean.com).
+Feito isso, vai precisar expotar essas variáveis para o ambiente.
 
 ```bash
 export do_token=<coloque-seu-token-aqui>
@@ -160,26 +161,51 @@ export do_token=<coloque-seu-token-aqui>
 export do_fingerprint=<coloque-seu-fingerprint-aqui>
 ```
 
-Depois crie a imagem docker para rodar os comandos.
+Depois crie a imagem docker com o terraform e ansible, execute:
 ```bash
 make build
 ```
 
-## Criando a infraestrutura
+Feito isso já é possível provisionar o ambiente usando terraform e ansible.
+
+### Criando a infraestrutura com Terraform
 Os comandos a baixo utilizam o terraform
 para gerenciar a infraestrutura.
 
 Para criar os recursos, execute:
-`make terraform-apply app=project-1 env=prod`
+```
+make terraform-apply app=project-1 env=prod
+```
+
+Abrindo o Digital Ocean, podemos visualizar
+os recursos criados.
+![alt text](docs/do-project-1.png)
 
 Se precisar destruir os recursos, execute:
-`make terraform-destroy app=project-1 env=prod`
+```
+make terraform-destroy app=project-1 env=prod
+```
 
-## Ansible
-`make ansible app=open-ideas env=prod`
+### Provisionando com o Ansible
+Com a *droplet* criada vamos provisionar usando ansible.
 
-`make ansible app=open-ideas env=prod tags=ruby,ssl`
+Para provisionar todo o ambiente do projeto, execute:
+```
+make ansible app=project-1 env=prod
+```
 
+Acessando o endereço ip da *droplet* já é possível acessar a aplicação.
+![alt text](docs/project-1.png)
+
+Se precisar especificar uma task, utilize a variável `tags`,
+conforme o exemplo a baixo:
+```bash
+make ansible app=project-1 env=prod tags=app
+```
+
+## Testando
+Para verificar o funcionamento da droplet, entre via ssh e liste
+os container em execução:
 
 ```bash
 > ssh 45.55.35.147 -l root
@@ -195,3 +221,5 @@ CONTAINER ID   IMAGE                 COMMAND                  CREATED          S
 863f134396b5   nginx:stable-alpine   "/docker-entrypoint.…"   47 seconds ago   Up 45 seconds   0.0.0.0:80->80/tcp   project-1
 ```
 
+Acessando o `project-2`
+![alt text](docs/project-2.png)
