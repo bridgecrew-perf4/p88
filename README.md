@@ -1,11 +1,7 @@
 # p88
-É como um piano de 88 teclas,
-onde cada nota orquestrada soam
-em harmonia. :joy: :musical_keyboard:
-
-O objetivo desse projeto é trazer qualidade de vida
-para os *devs* que tem vários projetos e não aguentam mais
-ficar configurando os apps na mão. :notes:
+p88 é um projeto criado para trazer mais qualidade de vida
+aos *devs*, principalmente os que tem vários projetos
+e não aguentam mais ficar configurando os apps na mão. :notes:
 
 Utilizando o conceito de *infra as code*
 cada *app* vai ter seus recursos como código,
@@ -17,6 +13,10 @@ e [ansible](https://www.ansible.com).
 O provedor que será utilizado é o
 [Digital Ocean](https://www.digitalocean.com),
 com máquinas a partir de $5/mês. :moneybag:
+
+É como um piano de 88 teclas,
+onde cada nota orquestrada de maneira controlada
+soa com mais harmonia. :joy: :musical_keyboard:
 
 ## Requisitos
 Para rodar esse projeto, vamos usar o 
@@ -80,10 +80,14 @@ No segundo `project-2`, será um ambiente de desenvolvimento
 com a imagem do `sapk/cloud9:golang-alpine`.
 
 ### Terraform
-Para criar a infraestrutura vamos utilizar o [terraform](https://www.terraform.io).
+O [terraform](https://www.terraform.io) é responsável por interagir e provisionar
+usando os recursos no provedor digital ocean. Como droplets, volumes, domain entre outros.
 
-No arquivo `locals.tf` são as variáveis que
-serão utilizadas para criação da infra:
+[Lista completa de recursos](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs)
+
+Para entender melhor, vamos dar uma olhada nos arquivos `.tf` do projeto.
+No arquivo `locals.tf` fica as declarações da variáveis locais
+que serão utilizadas para a criação dos recursos:
 ```
 locals {
 	env = "production"
@@ -98,7 +102,7 @@ locals {
 }
 ```
 
-No `main.tf`, são as definições dos recursos que serão criados:
+No `main.tf`, são as definições dos recursos:
 ```
 provider "digitalocean" {
   token = var.do_token
