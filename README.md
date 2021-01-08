@@ -1,22 +1,22 @@
 # p88
 p88 é um projeto criado para trazer mais qualidade de vida
 aos *devs*, principalmente os que tem vários projetos
-e não aguentam mais ficar configurando os apps na mão. :notes:
+e não aguentam mais ficar configurando os apps na mão. :raised_hands:
 
 Utilizando o conceito de *infra as code*
 cada *app* vai ter seus recursos como código,
 tendo controle do que tem em cada VM e possibilitando
 recriar os ambientes com pouco esforço usando
-[terraform](https://www.terraform.io)
-e [ansible](https://www.ansible.com).
+[Terraform](https://www.terraform.io)
+e [Ansible](https://www.ansible.com).
 
 O provedor que será utilizado é o
-[Digital Ocean](https://www.digitalocean.com),
+[DigitalOcean](https://www.digitalocean.com),
 com máquinas a partir de $5/mês. :moneybag:
 
 É como um piano de 88 teclas,
 onde cada nota orquestrada de maneira controlada
-soa com mais harmonia. :joy: :musical_keyboard:
+soa com mais harmonia. :joy: :musical_keyboard: :notes:
 
 ## Requisitos
 Para rodar esse projeto, vamos usar o 
@@ -24,9 +24,9 @@ Para rodar esse projeto, vamos usar o
 com a imagem base `debian stable-slim`. :whale2:
 
 Vamos precisar de uma conta no 
-[Digital Ocean](https://www.digitalocean.com)
+[DigitalOcean](https://www.digitalocean.com)
 e criar um *token* e um *fingerprint* para
-interagir via API com o [terraform](https://www.terraform.io).
+interagir via API com o [Terraform](https://www.terraform.io).
 
 ## Apps
 Os apps são as divisões de aplicativos/projetos
@@ -80,8 +80,9 @@ No segundo `project-2`, será um ambiente de desenvolvimento
 com a imagem do `sapk/cloud9:golang-alpine`.
 
 ### Terraform
-O [terraform](https://www.terraform.io) é responsável por interagir e provisionar
-usando os recursos no provedor digital ocean. Como droplets, volumes, domain entre outros.
+O [Terraform](https://www.terraform.io) é responsável por interagir e provisionar
+usando os recursos no provedor [DigitalOcean](https://www.digitalocean.com).
+Como droplets, volumes, domain entre outros.
 
 [Lista completa de recursos](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs)
 
@@ -144,12 +145,14 @@ module "project" {
 ```
 
 Nesse exemplo, criamos uma *droplet*, um *domain*
-e relacionamos os dois a um *projeto* no
-[Digital Ocean](https://www.digitalocean.com).
+e relacionamos os dois a um *project* no
+[DigitalOcean](https://www.digitalocean.com).
 
 ### Ansible
-Vamos usar o [ansible](https://www.ansible.com)
-para configurar as *droplets*.
+O [ansible](https://www.ansible.com) atua
+na segunda etapa, depois que os servidores estão criados.
+Ele será responsável em configurar as *droplets* na camada de software,
+baixando e subindo as imagens docker.
 
 Exemplo do `config.yml`:
 ```yml
@@ -162,7 +165,11 @@ all:
     image: nginx:stable-alpine
 ```
 
-Arquivo `playbook.yml` com exemplo de task:
+> O host `104.236.36.162` é o endereço ip da *droplet* que acabamos de criar usando o [Terraform](https://www.terraform.io). Atualize esse endereço correspondente ao servidor que deseja provisionar.
+
+No arquivo `playbook.yml` ficam as
+[roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
+e tasks que vamos executar no provisonamento:
 ```yml
 tasks:
   - name: Create container
@@ -175,31 +182,38 @@ tasks:
         - 80:80
 ```
 
-Nesse exemplo do `project-1` foram instaladas duas *roles*
-do ansible [docker](https://github.com/geerlingguy/ansible-role-docker)
+Nesse exemplo do `project-1` foram instaladas duas *roles*,
+[docker](https://github.com/geerlingguy/ansible-role-docker)
 e [pip](https://github.com/geerlingguy/ansible-role-pip) para configurar a *droplet*.
 Posteriormente baixando e criando o container
 com a imagem `nginx:stable-alpine` disponível no
 [Docker Hub](https://hub.docker.com/_/nginx).
 
+Para mais informações sobre ansible playbook
+[clique aqui](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html).
+
 ## Rodando o Projeto
-Para rodar o projeto vamos precisar expotar o `token` e o
-`fingerprint`criado no [Digital Ocean](https://www.digitalocean.com)
+Para rodar o projeto vamos precisar exportar o `token` e o
+`fingerprint` criado no [DigitalOcean](https://www.digitalocean.com)
 como variáveis de ambiente:
 ```bash
 export do_token=<coloque-seu-token-aqui>
 export do_fingerprint=<coloque-seu-fingerprint-aqui>
 ```
 
+Para mais informações acesse de como criar o Access Token e configurar veja os links abaixo:
+- [How to Create a Personal Access Token](https://www.digitalocean.com/docs/apis-clis/api/create-personal-access-token)
+- [Terraform - Digital Ocean Provider](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs)
+
 Depois vamos construir a imagem docker do p88 com o terraform e
-[ansible](https://www.ansible.com)
+[Ansible](https://www.ansible.com)
 para rodar os provisionamentos:
 ```bash
 make build
 ```
 
 > Feito isso já é possível provisionar o ambiente usando terraform e
-[ansible](https://www.ansible.com).
+[Ansible](https://www.ansible.com).
 
 ### Criando a infraestrutura com Terraform
 Os comandos a baixo utilizam o terraform
@@ -210,7 +224,7 @@ Para criar os recursos, execute:
 make terraform-apply app=project-1 env=prod
 ```
 
-Abrindo o [Digital Ocean](https://www.digitalocean.com),
+Abrindo o [DigitalOcean](https://www.digitalocean.com),
 podemos visualizar os recursos criados:
 ![alt text](docs/do-project-1.png)
 
@@ -221,7 +235,7 @@ make terraform-destroy app=project-1 env=prod
 
 ### Provisionando com o Ansible
 Com a *droplet* criada vamos provisionar usando
-[ansible](https://www.ansible.com).
+[Ansible](https://www.ansible.com).
 
 Para provisionar todo o ambiente do projeto, execute:
 ```
