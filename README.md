@@ -149,7 +149,7 @@ e relacionamos os dois a um *project* no
 [DigitalOcean](https://www.digitalocean.com).
 
 ### Ansible
-O [ansible](https://www.ansible.com) atua
+O [Ansible](https://www.ansible.com) atua
 na segunda etapa, depois que os servidores estão criados.
 Ele será responsável em configurar as *droplets* na camada de software,
 baixando e subindo as imagens docker.
