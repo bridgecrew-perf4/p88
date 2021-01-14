@@ -252,7 +252,7 @@ make ansible app=project-1 env=prod tags=app
 ```
 
 ## Testando
-Para verificar o funcionamento da * droplet* , entre via `ssh <container-ip> -l root`
+Para verificar o funcionamento da *droplet*, entre o via `ssh <droplet-ip> -l root`
 e liste os container em execução usando `docker ps`:
 ```bash
 > ssh 45.55.35.147 -l root
@@ -261,5 +261,5 @@ CONTAINER ID   IMAGE                 COMMAND                  CREATED          S
 863f134396b5   nginx:stable-alpine   "/docker-entrypoint.…"   47 seconds ago   Up 45 seconds   0.0.0.0:80->80/tcp   project-1
 ```
 
-Acessando o ambiente de dessenvolimento do `project-2`:
+Acessando o `project-2` como um ambiente de dessenvolimento:
 ![alt text](docs/project-2.png)
